@@ -2,7 +2,7 @@
 SFDialPlateSDK
 SiFli Solution 1.1.0 Dial Transmission Component
 
-##1.zip file
+## 1.zip file
 
 ```
     /// 推送表盘文件
@@ -16,7 +16,7 @@ SiFli Solution 1.1.0 Dial Transmission Component
 
 ```
 
-##2.file collection
+## 2.file collection
 
 ```
   /// 推送表盘文件
