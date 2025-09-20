@@ -93,6 +93,14 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
         self.shell.clearAllTasks()
     }
     
+    @objc public func getCompleteBytes()->Int{
+        return self.completedBytes;
+    }
+    
+    @objc public func getTotalBytes()->Int{
+        return self.totalBytes;
+    }
+    
     
     /// 推送表盘文件
     /// - Parameters:
@@ -280,7 +288,9 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
             error.errType = .Timeout
             error.errInfo = "未找到目标外设:\(self.pushInfo?.targetIdentifier ?? "")"
             self.clearWorks()
-            self.delegate?.dialPlateManager(manager: self, complete: error)
+            DispatchQueue.main.async {
+                self.delegate?.dialPlateManager(manager: self, complete: error)
+            }
             return
         }
         
@@ -338,7 +348,10 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
     
     func dialPlateShell(shell: SFDialPlateShell, didUpdateState state: DPBleCoreManagerState) {
         QPrint("蓝牙状态改变:\(state)(\(state.rawValue))")
-        delegate?.dialPlateManager(manager: self, didUpdateBLEState: state)
+        
+        DispatchQueue.main.async {
+            self.delegate?.dialPlateManager(manager: self, didUpdateBLEState: state)
+        }
     }
     
     func dialPlateShell(shell: SFDialPlateShell, failedToConnect peripheral: CBPeripheral, error: SFError) {
@@ -348,7 +361,9 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
         }
         QPrint("❌连接外设失败:\(error.errType)(\(error.errType.rawValue),\(error.errInfo))")
         clearWorks()
-        delegate?.dialPlateManager(manager: self, complete: error)
+        DispatchQueue.main.async {
+            self.delegate?.dialPlateManager(manager: self, complete: error)
+        }
     }
     
     func dialPlateShell(shell: SFDialPlateShell, successToConnect peripheral: CBPeripheral, handShaked: Bool) {
@@ -614,10 +629,14 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
             QPrint("⚠️总体开始，重新分割文件: \(s.pushInfo!.maxFileSliceLength) ===> \(maxDataLen)")
             realMaxFileSliceLength = maxDataLen
         }
+        QPrint("✅realMaxFileSliceLength=\(realMaxFileSliceLength)")
         for f in s.pushInfo!.files{
             f.reSliceFile(maxDataLen: realMaxFileSliceLength)
         }
-        s.delegate?.dialPlateManager(manager: s, progress: s.formattedProgress(totalBytes: s.totalBytes, completedBytes: s.completedBytes))
+        DispatchQueue.main.async {
+            s.delegate?.dialPlateManager(manager: s, progress: s.formattedProgress(totalBytes: s.totalBytes, completedBytes: s.completedBytes))
+        }
+        
         s.pushStepFileStart(fileIndex: 0)
     }
     
@@ -734,7 +753,9 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
                 return
             }
             s.completedBytes += task.fileData.count
-            s.delegate?.dialPlateManager(manager: s, progress: s.formattedProgress(totalBytes: s.totalBytes, completedBytes: s.completedBytes))
+            DispatchQueue.main.async {
+                s.delegate?.dialPlateManager(manager: s, progress: s.formattedProgress(totalBytes: s.totalBytes, completedBytes: s.completedBytes))
+            }
             if sliceIndex < file.fileSlice.count-1{
                 // 继续发送该file的其它slice
                 s.pushStepSendFile(fileIndex: fileIndex, sliceIndex: sliceIndex+1)
@@ -866,7 +887,10 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
             self.searchTimer?.invalidate()
         }
         self.clearWorks()
-        self.delegate?.dialPlateManager(manager: self, complete: error)
+        DispatchQueue.main.async {
+            self.delegate?.dialPlateManager(manager: self, complete: error)
+        }
+       
         //表盘改为连续传输，任务结束不断开连接，stop()时机断开
 //        shell.cancelConnection()
     }
