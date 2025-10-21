@@ -71,7 +71,7 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
     // 一次流程中，出现3次LoseCheck携带Serial transport Error 则退出流程，并在回调信息中告知用户减小maxFileSliceLength
     private var loseCheckReceiveErrorCount = 0
     
-    private var delayRestartTimer:Timer?
+//    private var delayRestartTimer:Timer?
     
     private var totalBytes = 0
     private var completedBytes = 0
@@ -451,17 +451,20 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
                     }
                 }
                 
-                self.delayRestartTimer?.invalidate()
-                self.delayRestartTimer = nil
+//                self.delayRestartTimer?.invalidate()
+//                self.delayRestartTimer = nil
                 
                 // 回复设备
                 let loseCheckRspTask = SFDialPlateLoseCheckRspTask.init(result: 0)
                 self.shell.resume(task: loseCheckRspTask)
                 
                 QPrint("⚠️调整包序号为'\(completedCount)'，1秒后重发。。。")
-                let timer = Timer.init(timeInterval: 1.0, target: self, selector: #selector(delayRestartHandler(timer:)), userInfo: completedCount, repeats: false)
-                self.delayRestartTimer = timer
-                RunLoop.main.add(timer, forMode: .default)
+//                let timer = Timer.init(timeInterval: 1.0, target: self, selector: #selector(delayRestartHandler(timer:)), userInfo: completedCount, repeats: false)
+//                self.delayRestartTimer = timer
+//                RunLoop.main.add(timer, forMode: .default)
+                QBleCore.sharedInstance.bleQueue.asyncAfter(deadline: .now() + 1) {
+                    self .delayRestartHandler(completedCount: completedCount)
+                }
             }else{
                 // 其它Result
                 QPrint("⚠️未知的LoseCheck Result:\(result)")
@@ -469,17 +472,21 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
         }
     }
     
-    @objc private func delayRestartHandler(timer:Timer) {
+    @objc private func delayRestartHandler(completedCount:UInt32) {
+        QPrint("⚠️delayRestartHandler \(completedCount)")
+//        let completedCount = timer.userInfo as! UInt32
         
-        let completedCount = timer.userInfo as! UInt32
-        
-        self.delayRestartTimer?.invalidate()
-        self.delayRestartTimer = nil
+//        self.delayRestartTimer?.invalidate()
+//        self.delayRestartTimer = nil
         
         if !self.isLoseChecking {
             // 已经不在发送状态
             QPrint("⚠️已不在loseChecking状态，忽略针对LoseCheck的重发")
             return
+        }
+        if(self.pushInfo == nil){
+            QPrint("⚠️pushInfo is nil，忽略针对LoseCheck的重发")
+            return;
         }
         self.isLoseChecking = false
         self.isSendingFile = true
@@ -866,8 +873,8 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
         self.isSendingFile = false
         self.isLoseChecking = false
         self.loseCheckReceiveErrorCount = 0
-        self.delayRestartTimer?.invalidate()
-        self.delayRestartTimer = nil
+//        self.delayRestartTimer?.invalidate()
+//        self.delayRestartTimer = nil
         isLoadingFiles = false
         self.searchTimer?.invalidate()
         self.searchTimer = nil
