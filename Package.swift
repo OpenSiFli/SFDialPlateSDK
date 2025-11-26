@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         // 添加对 Zip 库的依赖
-        .package(url: "https://github.com/marmelroy/Zip.git", from: "2.1.0"),
+        .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.0"))
         // 注意：这里使用了 from: "2.1.0" 而不是 .upToNextMinor(from: "2.1")，
         // 因为 .upToNextMinor 不是一个有效的 Swift Package Manager 语法。
         // 如果你确实想要自动更新到下一个次要版本，可以使用 from: 并省略具体的次版本号，
@@ -28,7 +28,7 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SFDialPlateSDK",
-            dependencies: ["Zip"], // 依赖声明
+            dependencies: ["ZIPFoundation"], // 依赖声明
             path: "Sources/SFDialPlateSDK" // 显式路径声明（可选）
         ),
         .testTarget(
