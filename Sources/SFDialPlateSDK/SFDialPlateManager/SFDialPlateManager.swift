@@ -1,6 +1,7 @@
 import UIKit
 import CoreBluetooth
-import Zip
+//import Zip
+import ZIPFoundation
 
 fileprivate let MaxFileReSendCount = 3
 fileprivate let MaxLoseCheckSerialTransErrorCount = 3
@@ -81,6 +82,7 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
     // 为nil表示还未通过“EntireStart”获取到设备版本号
     // 老设备没有版本号，但经过EntireStart后会认为版本为0
     private var deviceVersion:UInt16?
+    private let cacheDirectory = "sifli_diaplate_res"
     
     private override init() {
         super.init()
@@ -112,7 +114,10 @@ fileprivate let MaxLoseCheckSerialTransErrorCount = 3
     @objc public func pushDialPlate(devIdentifier:String, type:UInt16, zipPath:URL, maxFileSliceLength:Int=1024, withByteAlign:Bool = false){
         isLoadingFiles = true
         do{
-            let unzipDirectory = try Zip.quickUnzipFile(zipPath)
+            let unzipDirectory = try CacheHelper.reCreateCacheDirectory(directory: self.cacheDirectory)
+            let fileManager = FileManager()
+            try fileManager.unzipItem(at: zipPath, to: unzipDirectory)
+//            let unzipDirectory = try Zip.quickUnzipFile(zipPath)
 //            QPrint("unzipDirectory = \(unzipDirectory)")
             let relativeFilePaths = PathUtils.RelativeFilePaths(rootPath: unzipDirectory)
             if relativeFilePaths == nil || relativeFilePaths?.count == 0{

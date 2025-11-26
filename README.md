@@ -28,3 +28,6 @@ SiFli Solution 1.1.0 Dial Transmission Component
     ///   - withByteAlign: 是否对文件进行CRC和字节对齐处理，需要依据具体的设备支持情况来决定该参数的取值。默认false。PS：当type为3时，总是会进行CRC和对齐操作，与该参数取值无关。当type=8 时，该参数无效，不会添加CRC和对齐
     @objc public func pushDialPlate(devIdentifier:String,type:UInt16, files:[SFFile], maxFileSliceLength:Int=1024, withByteAlign:Bool = false)
 ```
+
+## 3. Change Log
+- 1.3.1 zip 切换为ZipFoundation
