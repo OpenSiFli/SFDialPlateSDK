@@ -1,6 +1,19 @@
 # SFDialPlateSDK
 SFDialPlateSDK
 SiFli Solution 1.1.0 Dial Transmission Component
+## 集成方式
+
+ swift package 引入
+ 
+```
+https://github.com/OpenSiFli/SFDialPlateSDK.git
+```
+
+ cocoapod 引入
+ 
+ ```bash
+ pod 'SFDialPlateSDK','1.3.3'
+ ```
 
 ## 1.zip file
 
@@ -35,3 +48,4 @@ SiFli Solution 1.1.0 Dial Transmission Component
 - 1.2.13 日志优化
 - 1.2.14 丢包重试一并放入蓝牙工作队列。
 - 1.3.2 zip 切换为ZipFoundation
+- 1.3.3 支持cocoapod
